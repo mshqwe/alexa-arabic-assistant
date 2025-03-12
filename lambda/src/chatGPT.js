@@ -1,118 +1,75 @@
-const Alexa = require('ask-sdk-core');
-const { speechClient } = require('./src/speechToText');
-const { chatGPTClient } = require('./src/chatGPT');
-const setupManager = require('./src/setup');
+const { Configuration, OpenAIApi } = require('openai');
+const config = require('./config');
 
-// إضافة دالة للإعداد الأولي
-const initializeSkill = async () => {
-  try {
-    await setupManager.setupS3Bucket();
-    await setupManager.setupIAMPermissions();
-    console.log('Skill setup completed successfully');
-  } catch (error) {
-    console.error('Error during skill setup:', error);
+class ChatGPTClient {
+  constructor() {
+    // تهيئة مكتبة OpenAI
+    this.configuration = new Configuration({
+      apiKey: config.OPENAI_API_KEY,
+    });
+    this.openai = new OpenAIApi(this.configuration);
+    
+    // تعريف سياق المحادثة الأولي
+    this.defaultSystemPrompt = `أنت مساعد لغوي ذكي باللغة العربية. يرجى:
+    1. الإجابة باللغة العربية الفصحى السلسة
+    2. تقديم إجابات مفيدة ومختصرة تناسب المحادثة الصوتية
+    3. استخدام لغة ودية ومهذبة
+    4. تجنب الإجابات الطويلة جداً
+    5. الإشارة بوضوح عندما لا تعرف الإجابة`;
+    
+    this.conversationHistory = [];
   }
-};
 
-const LaunchRequestHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
-  },
-  handle(handlerInput) {
-    const speakOutput = 'مرحباً بك! يمكنك سؤالي أي شيء عن طريق قول "اسأل المساعد" متبوعاً بسؤالك';
-    return handlerInput.responseBuilder
-      .speak(speakOutput)
-      .reprompt(speakOutput)
-      .getResponse();
-  }
-};
-
-const AudioChatIntentHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AudioChatIntent';
-  },
-  async handle(handlerInput) {
+  async getResponse(userQuery) {
     try {
-      const audioData = Alexa.getSlotValue(handlerInput.requestEnvelope, 'audioData');
-      if (!audioData) {
-        throw new Error('No audio data provided');
-      }
-
-      // Convert audio to text using Google STT
-      const transcription = await speechClient.transcribeAudio(audioData);
+      // إضافة سؤال المستخدم إلى سجل المحادثة
+      this.addToConversationHistory('user', userQuery);
       
-      // Get ChatGPT response
-      const response = await chatGPTClient.getResponse(transcription);
-
-      return handlerInput.responseBuilder
-        .speak(response)
-        .reprompt('Would you like to ask something else?')
-        .getResponse();
+      // إنشاء قائمة الرسائل التي سيتم إرسالها إلى OpenAI
+      const messages = [
+        { role: 'system', content: this.defaultSystemPrompt },
+        ...this.conversationHistory.slice(-10) // الاحتفاظ بآخر 10 رسائل فقط
+      ];
+      
+      // إرسال الطلب إلى OpenAI API
+      const response = await this.openai.createChatCompletion({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 150,
+        top_p: 1.0,
+        frequency_penalty: 0.0,
+        presence_penalty: 0.0,
+      });
+      
+      // استخراج الرد
+      const responseText = response.data.choices[0].message.content;
+      
+      // إضافة رد المساعد إلى سجل المحادثة
+      this.addToConversationHistory('assistant', responseText);
+      
+      return responseText;
     } catch (error) {
-      console.error('Error:', error);
-      return handlerInput.responseBuilder
-        .speak('Sorry, there was an error processing your request.')
-        .getResponse();
+      console.error('OpenAI API Error:', error);
+      return 'عذراً، حدث خطأ أثناء معالجة طلبك. حاول مرة أخرى لاحقاً.';
     }
   }
-};
 
-const HelpIntentHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
-  },
-  handle(handlerInput) {
-    const speakOutput = 'يمكنك بدء المحادثة بقول "اسأل المساعد" متبوعاً بسؤالك';
-    return handlerInput.responseBuilder
-      .speak(speakOutput)
-      .reprompt(speakOutput)
-      .getResponse();
+  addToConversationHistory(role, content) {
+    this.conversationHistory.push({
+      role: role,
+      content: content
+    });
+    
+    // الحفاظ على حجم معقول لسجل المحادثة (اختياري)
+    if (this.conversationHistory.length > 20) {
+      this.conversationHistory = this.conversationHistory.slice(-20);
+    }
   }
-};
 
-const CancelAndStopIntentHandler = {
-  canHandle(handlerInput) {
-    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-      && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
-        || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
-  },
-  handle(handlerInput) {
-    const speakOutput = 'مع السلامة';
-    return handlerInput.responseBuilder
-      .speak(speakOutput)
-      .getResponse();
+  clearConversationHistory() {
+    this.conversationHistory = [];
   }
-};
+}
 
-const ErrorHandler = {
-  canHandle() {
-    return true;
-  },
-  handle(handlerInput, error) {
-    console.error('Error handled:', error);
-    const speakOutput = 'عذراً، حدث خطأ ما. الرجاء المحاولة مرة أخرى';
-
-    return handlerInput.responseBuilder
-      .speak(speakOutput)
-      .reprompt(speakOutput)
-      .getResponse();
-  }
-};
-
-exports.handler = Alexa.SkillBuilders.custom()
-  .addRequestHandlers(
-    LaunchRequestHandler,
-    AudioChatIntentHandler,
-    HelpIntentHandler,
-    CancelAndStopIntentHandler
-  )
-  .addErrorHandlers(ErrorHandler)
-  .withApiClient(new Alexa.DefaultApiClient())
-  .withCustomUserAgent('alexa-skill/arabic-assistant/1.0.0')
-  .withLocale('ar-SA') // تحديد اللغة العربية كلغة افتراضية
-  .lambda();
-
-// تشغيل الإعداد عند بدء Lambda
-initializeSkill();
+exports.chatGPTClient = new ChatGPTClient();
