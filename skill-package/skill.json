@@ -5,27 +5,56 @@
         "ar-SA": {
           "name": "المساعد الذكي",
           "summary": "مساعد ذكي يتحدث العربية",
-          "description": "مساعد ذكي يستخدم ChatGPT للإجابة على الأسئلة باللغة العربية",
+          "description": "مساعد ذكي يستخدم ChatGPT للإجابة على الأسئلة باللغة العربية. يمكنك سؤال المساعد أي شيء وسيجيبك باللغة العربية بشكل طبيعي وسلس. المساعد يفهم الأسئلة المتنوعة في مجالات مختلفة.",
           "examplePhrases": [
-            "افتح المساعد",
-            "اسأل المساعد عن الطقس",
-            "قل للمساعد كيف حالك"
-          ]
+            "افتح المساعد الذكي",
+            "اسأل المساعد الذكي عن الطقس",
+            "قل للمساعد الذكي ما هي عاصمة مصر"
+          ],
+          "keywords": [
+            "مساعد",
+            "ذكاء اصطناعي",
+            "محادثة",
+            "أسئلة",
+            "عربي",
+            "chat",
+            "gpt"
+          ],
+          "smallIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/6a0d/f8f83b64cc9342f3a8353a167e004d96/APP_ICON?versionId=GEV_OdSpdHh1PqZ7zQitL5mgfZj6Vyqs&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250312T000000Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAWBV6LQ4QDXWFVRZ4%2F20250312%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=abcdef1234567890abcdef1234567890abcdef1234567890",
+          "largeIconUri": "https://s3.amazonaws.com/CAPS-SSE/echo_developer/73d6/23de021b12b54d43a87812485c897f42/APP_ICON_LARGE?versionId=k7ulOVd1K4_UkXB6Q.9Hh6dT6t0bv2yD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250312T000000Z&X-Amz-SignedHeaders=host&X-Amz-Expires=86400&X-Amz-Credential=AKIAWBV6LQ4QDXWFVRZ4%2F20250312%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=abcdef1234567890abcdef1234567890abcdef1234567890"
         }
-      }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "قم بفتح المهارة بقول 'افتح المساعد الذكي'. ثم اطرح أي سؤال بقول 'اسأل المساعد الذكي + السؤال'.",
+      "category": "KNOWLEDGE_AND_TRIVIA",
+      "distributionCountries": []
     },
     "apis": {
       "custom": {
         "endpoint": {
           "uri": "arn:aws:lambda:us-east-1:YOUR_ID:function:alexa-arabic-assistant"
         },
-        "interfaces": [],
-        "sourceDir": "lambda",
-        "repository": {
-          "type": "git",
-          "url": "https://github.com/mshqwe/alexa-arabic-assistant.git"
-        }
+        "interfaces": []
       }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::profile:name:read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "locales": {
+        "ar-SA": {
+          "privacyPolicyUrl": "https://www.example.com/privacy-policy",
+          "termsOfUseUrl": "https://www.example.com/terms-of-use"
+        }
+      },
+      "isExportCompliant": true,
+      "containsAds": false,
+      "isChildDirected": false,
+      "usesPersonalInfo": false
     }
   }
 }
