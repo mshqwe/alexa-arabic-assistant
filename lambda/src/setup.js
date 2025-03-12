@@ -22,7 +22,6 @@ class SetupManager {
   }
 
   async setupIAMPermissions() {
-    // إعداد صلاحيات IAM
     const policyDocument = {
       Version: "2012-10-17",
       Statement: [
@@ -32,11 +31,18 @@ class SetupManager {
             "s3:PutObject",
             "s3:GetObject",
             "transcribe:StartTranscriptionJob",
-            "transcribe:GetTranscriptionJob"
+            "transcribe:GetTranscriptionJob",
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents",
+            "logs:StartLiveTail",
+            "logs:GetLogEvents",
+            "logs:FilterLogEvents"
           ],
           Resource: [
             `arn:aws:s3:::${config.S3_CONFIG.bucketName}/*`,
-            "arn:aws:transcribe:*:*:*"
+            "arn:aws:transcribe:*:*:*",
+            "arn:aws:logs:*:*:*"
           ]
         }
       ]
