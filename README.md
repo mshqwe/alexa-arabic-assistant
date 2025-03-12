@@ -15,7 +15,7 @@
 ## التثبيت
 1. نسخ المشروع:
 ```bash
-git clone https://github.com/{ACTUAL_USERNAME}/alexa-arabic-assistant.git
+git clone https://github.com/mshqwe/alexa-arabic-assistant.git
 cd alexa-arabic-assistant
 ```
 
