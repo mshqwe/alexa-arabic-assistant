@@ -23,7 +23,7 @@
         "sourceDir": "lambda",
         "repository": {
           "type": "git",
-          "url": "https://github.com/YOUR_USERNAME/smart-assistant-alexa.git"
+          "url": "https://github.com/{ACTUAL_USERNAME}/alexa-arabic-assistant.git"
         }
       }
     }
