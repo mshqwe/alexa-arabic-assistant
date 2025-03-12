@@ -10,3 +10,5 @@ dist/
 build/
 .env*
 !.env.example
+ask-resources.json
+node_modules/

@@ -19,7 +19,7 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speakOutput = 'مرحباً بك! يمكنك سؤالي أي شيء عن طريق قول "اسأل المساعد" متبوعاً بسؤالك';
+    const speakOutput = 'مرحباً بك! يمكنك سؤالي أي شيء عن طريق قول "اسأل مساعدي" متبوعاً بسؤالك';
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(speakOutput)
