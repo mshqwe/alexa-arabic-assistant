@@ -4,4 +4,9 @@ lambda/node_modules/
 lambda/package-lock.json
 *.zip
 *.log
-node_modules/
+.DS_Store
+coverage/
+dist/
+build/
+.env*
+!.env.example
