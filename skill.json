@@ -1,0 +1,31 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "ar-SA": {
+          "name": "المساعد الذكي",
+          "summary": "مساعد ذكي يتحدث العربية",
+          "description": "مساعد ذكي يستخدم ChatGPT للإجابة على الأسئلة باللغة العربية",
+          "examplePhrases": [
+            "افتح المساعد",
+            "اسأل المساعد عن الطقس",
+            "قل للمساعد كيف حالك"
+          ]
+        }
+      }
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:YOUR_ID:function:YOUR_FUNCTION"
+        },
+        "interfaces": [],
+        "sourceDir": "lambda",
+        "repository": {
+          "type": "git",
+          "url": "https://github.com/YOUR_USERNAME/smart-assistant-alexa.git"
+        }
+      }
+    }
+  }
+}

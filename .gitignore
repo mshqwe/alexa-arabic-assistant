@@ -1,0 +1,7 @@
+.ask/
+.env
+lambda/node_modules/
+lambda/package-lock.json
+*.zip
+*.log
+node_modules/

@@ -1,0 +1,57 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "langCode": "ar-SA",
+      "invocationName": "المساعد",
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      },
+      "intents": [
+        {
+          "name": "AudioChatIntent",
+          "slots": [
+            {
+              "name": "audioData",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "اسأل المساعد {audioData}",
+            "قل للمساعد {audioData}",
+            "المساعد {audioData}",
+            "اسأله عن {audioData}",
+            "اخبرني عن {audioData}",
+            "ما هو {audioData}",
+            "ما معنى {audioData}",
+            "كيف {audioData}",
+            "متى {audioData}",
+            "أين {audioData}",
+            "لماذا {audioData}",
+            "شرح لي {audioData}",
+            "فسر لي {audioData}",
+            "اشرح {audioData}",
+            "احكي لي عن {audioData}"
+          ]
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        }
+      ]
+    }
+  }
+}
