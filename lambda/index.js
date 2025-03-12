@@ -19,7 +19,7 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speakOutput = 'مرحباً بك! يمكنك سؤالي أي شيء عن طريق قول "اسأل مساعدي" متبوعاً بسؤالك';
+    const speakOutput = 'مرحباً بك! يمكنك سؤالي أي شيء عن طريق قول "اسأل المساعد" متبوعاً بسؤالك';
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(speakOutput)
@@ -39,10 +39,10 @@ const AudioChatIntentHandler = {
         throw new Error('No audio data provided');
       }
 
-      // Convert audio to text using Google STT
+      // تحويل الصوت إلى نص باستخدام Amazon Transcribe
       const transcription = await speechClient.transcribeAudio(audioData);
       
-      // Get ChatGPT response
+      // الحصول على رد من ChatGPT
       const response = await chatGPTClient.getResponse(transcription);
 
       return handlerInput.responseBuilder
@@ -86,6 +86,32 @@ const CancelAndStopIntentHandler = {
   }
 };
 
+// معالج للنية الافتراضية عندما لا تتعرف أليكسا على ما يقوله المستخدم
+const FallbackIntentHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+      && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
+  },
+  handle(handlerInput) {
+    const speakOutput = 'عذراً، لم أفهم ما تريد. يمكنك قول "مساعدة" للحصول على معلومات حول كيفية استخدامي.';
+    return handlerInput.responseBuilder
+      .speak(speakOutput)
+      .reprompt(speakOutput)
+      .getResponse();
+  }
+};
+
+const SessionEndedRequestHandler = {
+  canHandle(handlerInput) {
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === 'SessionEndedRequest';
+  },
+  handle(handlerInput) {
+    // أي عمليات تنظيف ضرورية
+    console.log(`Session ended with reason: ${handlerInput.requestEnvelope.request.reason}`);
+    return handlerInput.responseBuilder.getResponse();
+  }
+};
+
 const ErrorHandler = {
   canHandle() {
     return true;
@@ -106,12 +132,19 @@ exports.handler = Alexa.SkillBuilders.custom()
     LaunchRequestHandler,
     AudioChatIntentHandler,
     HelpIntentHandler,
-    CancelAndStopIntentHandler
+    CancelAndStopIntentHandler,
+    FallbackIntentHandler,
+    SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
   .withApiClient(new Alexa.DefaultApiClient())
   .withCustomUserAgent('alexa-skill/arabic-assistant/1.0.0')
-  .withLocale('ar-SA') // تحديد اللغة العربية كلغة افتراضية
+  .withPersistenceAdapter(
+    new Alexa.DynamoDbPersistenceAdapter({
+      tableName: 'alexa-arabic-assistant-table',
+      createTable: true
+    })
+  )
   .lambda();
 
 // تشغيل الإعداد عند بدء Lambda
